@@ -1,0 +1,148 @@
+<?php
+
+	$title = 'Banner Detail';
+	$window_title = 'Hoy Milonga: '.$title;
+		
+	$this->headTitle($window_title);
+
+			//Load the rest if the controller hierachy
+	$this->headScript()->prependFile($this->basePath('/angularjs/module/AdminWebApp/Controller/contactMgmtCtrl.js','text/javascript',array('noescape' => true)));
+	$this->headScript()->prependFile($this->basePath('/angularjs/module/AdminWebApp/Controller/commentsForAdminCtrl.js','text/javascript',array('noescape' => true)));
+	$this->headScript()->prependFile($this->basePath('/angularjs/module/AdminWebApp/Controller/bannerDetailCtrl.js','text/javascript',array('noescape' => true)));
+	$this->headScript()->prependFile($this->basePath('/angularjs/module/AdminWebApp/Controller/detailCtrl.js','text/javascript',array('noescape' => true)));
+	$this->headScript()->prependFile($this->basePath('/angularjs/module/AdminWebApp/Controller/mainCtrl.js','text/javascript',array('noescape' => true)));
+
+?>
+
+<script>
+	s2cInfo.entityName = '<? echo $entityName ?>';
+	s2cInfo.mode = '<? echo $mode ?>'; //This is defined in the controller, as the model view
+	s2cInfo.id =  <? echo $id ?>; //This is defined in the controller, as the model view
+</script>
+
+<style>
+
+</style>
+<div class="container" ng-controller="detailCtrl">
+
+	<div ng-controller="bannerDetailCtrl">
+	
+		<? echo $this->partial('detailControlPanel.phtml'); ?>
+
+		<form id="detailForm" name="detailForm" novalidate>
+			<div class="well" ng-hide="data.hideThis">
+		
+				<div class="form-group">
+						<label for="bannerID" >bannerID</label>
+						<input DATA-SAVE name="bannerID" id="bannerID" class="form-control" readonly required ng-model="data.entity.bannerID"></input>
+				</div>
+		
+			</div> <!-- ends well -->
+		
+			<h4>Business Info</h4>
+			<div class="well">
+				<div class="row">
+					<div class="form-group col-12 col-md-8">
+						<div class="input-group">
+							<input class="form-control" id="businessName" name="businessName" required ng-model="data.entity.businessName" placeholder="Enter a partial business name"></input>
+							<span class="input-group-btn"><button class="btn btn-primary btn-sm" id="validateBusinessButton" ng-click="validateBusiness(data.entity.businessName)"
+									 ng-disabled="data.entity.businessName == null || data.entity.businessName == ''""><span class="glyphicon glyphicon-ok"></span></button></span>
+							<span class="input-group-btn"><button class="btn btn-default btn-sm" ng-click="new('business')"><span class="glyphicon glyphicon-plus"></span></button></span>
+						</div>
+						<div class="validation-error" ng-show="validationErrorsAreShowing()">
+							<span class="text-danger" ng-show="validation.noValidBusiness.flag">{{validation.noValidBusiness.error}}</span>
+						</div>
+
+							<? // I need this element hidden so I can save its value when changed by validateBusiness() ?>
+						<input class="form-control"  ng-hide="data.hideThis" DATA-SAVE name="businessID" required readonly ng-model="data.entity.businessID"></input>				
+						categories: {{data.entity.businessCategories}}
+
+					</div>
+				</div> <!-- row -->
+			</div> <!-- well -->	
+				
+			<h4>Display Info</h4>	
+			<div class="well">
+				<div class="row">
+					<div class="form-group col-4 col-sm-2">
+					<label for="displayStatus">.</label>
+					<input class="form-control" style="color:red;font-size:120%;text-align=center"  id="displayStatus" name="displayStatus" disabled ng-model="data.entity.displayStatus"></input>
+				</div>		
+			</div>	<!-- row -->
+				<div class="row">
+						
+					<div class="form-group col-3 col-md-2"">
+							<label for="module">Module</label>
+							<input DATA-SAVE name="module" id="module" readonly class="form-control"  ng-model="data.entity.module"></input>
+					</div>
+
+					<div class="form-group col-3 col-md-2">
+							<label for="displayStarts">Display Starts</label>
+							<input class="form-control is_date" id="displayStarts" required name="displayStarts" DATA-SAVE  ng-model="data.entity.displayStarts"   ng-change="updateValidationMessages()"></input>
+							<div class="validation-error" ng-show="validationErrorsAreShowing()">
+								<span class="text-danger" ng-show="validation.missingDisplayStarts.flag">{{validation.missingDisplayStarts.error}}<br></span>
+								<span class="text-danger" ng-show="validation.displayStartsInThePast.flag">{{validation.displayStartsInThePast.error}}</span>
+							</div>
+							<div class="validation-warning" ng-show="validationWarningsAreShowing()">
+								<span class="text-warning" ng-show="validation.displayStartsInTheFarFuture.flag">{{validation.displayStartsInTheFarFuture.error}}<br></span>
+							</div>
+					</div>
+
+					<div class="form-group col-3 col-md-2">
+							<label for="displayEnds">Display Ends</label>
+							<input class="form-control is_date" id="displayEnds"  name="displayEnds" DATA-SAVE ng-model="data.entity.displayEnds"  ng-change="updateValidationMessages()"></input>
+							<div class="validation-error" ng-show="validationErrorsAreShowing()">
+								<span class="text-danger" ng-show="validation.displayEndsBeforeStarts.flag">{{validation.displayEndsBeforeStarts.error}}<br></span>
+							</div>
+							<div class="validation-warning" ng-show="validationWarningsAreShowing()">
+								<span class="text-warning" ng-show="validation.displayEndsIsNull.flag">{{validation.displayEndsIsNull.error}}<br></span>
+							</div>
+					</div>
+					
+					<div class="form-group col-3 col-md-2">
+							<label for="displayInAreaID">Display in Area ID</label>
+							<input class="form-control" DATA-SAVE name="displayInAreaID" id="displayInAreaID" placeholder="Defaults to business areaID:  {{data.entity.businessAreaID}}" readonly   ng-model="data.entity.displayInAreaID"></input>
+					</div>
+
+				</div> <!-- row -->
+				
+				<div class="row">
+					<div class="form-group col-12 col-md-8">
+						<label for="website">When Clicked Goes to Website</label>
+						<div class="input-group">
+							<input DATA-SAVE type="text" id="website" name="website" class="form-control"   placeholder="Defaults to business website:  {{data.entity.businessWebsite}}" ng-model="data.entity.website" ng-change="updateValidationMessages()"></input>
+										<span class="input-group-btn"><button class="btn btn-primary" id="goWS" ng-click="gotoWebsite(data.entity.website)" ng-disabled="data.entity.website==null || data.entity.website==''"><span class="glyphicon glyphicon-zoom-in"></span></button></span>
+						</div>
+						<div class="validation-error" ng-show="validationErrorsAreShowing()">
+							<span class="text-danger" ng-show="validation.websiteIsNotCorrect.flag">{{validation.websiteIsNotCorrect.error}}<br></span>
+							<span class="text-danger" ng-show="validation.noWebsiteANDnoBusinessWebsite.flag">{{validation.noWebsiteANDnoBusinessWebsite.error}}<br></span>
+						</div>
+					</div>
+				</div> <!-- row -->
+
+				<div class="row">
+					<div class="checkbox col-12">
+						<label for="inactiveFlag">
+							<input DATA-SAVE name="inactiveFlag" type="checkbox" id="inactiveFlag"  ng-true-value="1" ng-false-value="0" ng-model="data.entity.inactiveFlag"></input>	
+							Inactive
+						</label>
+					</div>
+				</div> <!-- row -->
+			</div> <!-- well -->
+			
+		<?	
+			echo $this->partial('imageInfo.phtml',array('imageNumber'=>'1','title'=>'Vertical Banner', 'note'=>'Choose a 200 x 600 pixels .jpg type image, at 80% quality.'));	
+			echo $this->partial('imageInfo.phtml',array('imageNumber'=>'2','title'=>'Horizontal Banner','note'=>'Choose a 1000 x 200 pixels .jpg type image, at 80% quality'));
+			
+			echo $this->partial('businessContactMgmt.phtml',array('asLinkedEntity'=>true));
+
+				//This entity inherits the areaID from the business, so we do not want it to be labeled with DATA-SAVE, 
+				//Read more inside the trackingInfo.phtml
+			echo $this->partial('trackingInfo.phtml',array('noAreaID'=>true)); 
+		
+		?>
+
+		</form>
+		
+	</div>
+</div>
