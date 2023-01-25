@@ -11,7 +11,6 @@
 
 <script setup>
     import 'bootstrap';
-    import './styles/my-styles.scss'
 
     const name = 'Hello World!'
 </script>

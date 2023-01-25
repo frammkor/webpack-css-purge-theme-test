@@ -4,6 +4,7 @@ const {VueLoaderPlugin} = require('vue-loader');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const MiniCssThemesWebpackPlugin = require('mini-css-themes-plugin');
 
 const config = {
     entry: './src/index.js',
@@ -27,7 +28,7 @@ const config = {
                         }
                     },
                     'postcss-loader',
-                    'sass-loader',
+                    'sass-loader'
                 ]
             }
         ]
@@ -41,7 +42,15 @@ const config = {
             templateContent: ({htmlWebpackPlugin}) => '<!DOCTYPE html><html><head><meta charset=\"utf-8\"><title>' + htmlWebpackPlugin.options.title + '</title></head><body><div id=\"app\"></div></body></html>',
             filename: 'index.html'
         }),
-        new MiniCssExtractPlugin()
+        new MiniCssExtractPlugin(),
+        new MiniCssThemesWebpackPlugin({
+            themes: {
+                'baseTheme': './src/styles/base.scss',
+                'hmc': './src/styles/hmc.scss',
+                'as1': './src/styles/as1.scss',
+            },
+            defaultTheme: 'baseTheme'
+        })
     ],
     optimization: {
         runtimeChunk: 'single',
